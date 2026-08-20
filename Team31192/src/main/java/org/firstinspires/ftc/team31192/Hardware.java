@@ -57,8 +57,8 @@ public class Hardware {
      * These values MUST be measured on the physical robot after mounting.
      * Incorrect offsets are one of the most common causes of autonomous inaccuracy.
      */
-    private static final double PINPOINT_X_OFFSET_MM = -96.00;
-    private static final double PINPOINT_Y_OFFSET_MM = 92.00;
+    private static final double PINPOINT_X_OFFSET_MM = 56.00;
+    private static final double PINPOINT_Y_OFFSET_MM = -153.50;
     private static final GoBildaOdometryPods PODS = GoBildaOdometryPods.goBILDA_4_BAR_POD;
 
     /*
