@@ -48,7 +48,7 @@ public class Hardware {
     private static final RevHubOrientationOnRobot.LogoFacingDirection LOGO_FACING =
             RevHubOrientationOnRobot.LogoFacingDirection.UP;
     private static final RevHubOrientationOnRobot.UsbFacingDirection USB_FACING =
-            RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
+            RevHubOrientationOnRobot.UsbFacingDirection.LEFT;
 
     /* =====================================================
      * CONSTRUCTOR
@@ -82,7 +82,7 @@ public class Hardware {
         frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
         backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
 
         // Brake is more predictable than coast when holding heading or stopping for turns.
         frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
