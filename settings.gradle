@@ -5,6 +5,12 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
 
 include ':FtcRobotController'
-include ':TeamCode'
+include ':Team00000'
+include ':Team31192'
+include ':Team36103'
+include ':Team36104'
