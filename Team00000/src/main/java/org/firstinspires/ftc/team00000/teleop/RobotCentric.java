@@ -15,11 +15,18 @@ public class RobotCentric extends OpMode {
     @Override
     public void init() {
         hardware = new Hardware(hardwareMap);
-        hardware.resetPose();
     }
 
     @Override
-    public void loop(){
+    public void init_loop() {
+        hardware.updatePose();
+        hardware.addInitTelemetry(telemetry);
+        telemetry.addData("Mode", "Robot Centric");
+        telemetry.update();
+    }
+
+    @Override
+    public void loop() {
         hardware.updatePose();
 
         double axial   = -gamepad1.left_stick_y;
@@ -28,10 +35,10 @@ public class RobotCentric extends OpMode {
 
         hardware.driveRobotCentric(axial, lateral, yaw);
 
-        // Telemetry
         hardware.addDriveTelemetry(telemetry);
         hardware.addPoseTelemetry(telemetry, DistanceUnit.MM, AngleUnit.DEGREES);
         telemetry.addData("Mode", "Robot Centric");
+        telemetry.addData("Pinpoint", hardware.isPinpointReady() ? "READY" : "NOT READY");
         telemetry.update();
     }
 }

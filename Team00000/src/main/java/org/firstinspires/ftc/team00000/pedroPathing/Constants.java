@@ -7,44 +7,51 @@ import com.pedropathing.ftc.FollowerBuilder;
 import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.pedropathing.ftc.localization.constants.PinpointConstants;
 import com.pedropathing.paths.PathConstraints;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.team00000.Hardware;
 
+/**
+ * Pedro Pathing follower settings. Drivetrain names, motor directions, and
+ * Pinpoint geometry live in {@link Hardware.Config} so teleop and autonomous
+ * share one source of truth.
+ */
 @Configurable
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(5.71645); // kilograms
 
-    public static MecanumConstants driveConstants = new MecanumConstants()
-            .maxPower(1)
-            .rightFrontMotorName("frontRightDrive")
-            .rightRearMotorName("backRightDrive")
-            .leftRearMotorName("backLeftDrive")
-            .leftFrontMotorName("frontLeftDrive")
-            .leftFrontMotorDirection(DcMotor.Direction.REVERSE)
-            .leftRearMotorDirection(DcMotor.Direction.REVERSE)
-            .rightFrontMotorDirection(DcMotor.Direction.FORWARD)
-            .rightRearMotorDirection(DcMotor.Direction.FORWARD);
-
-    public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(-153.50)
-            .strafePodX(56.00)
-            .distanceUnit(DistanceUnit.MM)
-            .hardwareMapName("pinpoint")
-            .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
-            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
-            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
-
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
+
+    public static MecanumConstants driveConstants() {
+        return new MecanumConstants()
+                .maxPower(Hardware.Config.DRIVE_MAX_POWER)
+                .rightFrontMotorName(Hardware.Config.FRONT_RIGHT_NAME)
+                .rightRearMotorName(Hardware.Config.BACK_RIGHT_NAME)
+                .leftRearMotorName(Hardware.Config.BACK_LEFT_NAME)
+                .leftFrontMotorName(Hardware.Config.FRONT_LEFT_NAME)
+                .leftFrontMotorDirection(Hardware.Config.FRONT_LEFT_DIRECTION)
+                .leftRearMotorDirection(Hardware.Config.BACK_LEFT_DIRECTION)
+                .rightFrontMotorDirection(Hardware.Config.FRONT_RIGHT_DIRECTION)
+                .rightRearMotorDirection(Hardware.Config.BACK_RIGHT_DIRECTION);
+    }
+
+    public static PinpointConstants localizerConstants() {
+        return new PinpointConstants()
+                .forwardPodY(Hardware.Config.FORWARD_POD_Y_MM)
+                .strafePodX(Hardware.Config.STRAFE_POD_X_MM)
+                .distanceUnit(Hardware.Config.PINPOINT_DISTANCE_UNIT)
+                .hardwareMapName(Hardware.Config.PINPOINT_NAME)
+                .encoderResolution(Hardware.Config.PODS)
+                .forwardEncoderDirection(Hardware.Config.FORWARD_ENCODER_DIRECTION)
+                .strafeEncoderDirection(Hardware.Config.STRAFE_ENCODER_DIRECTION);
+    }
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
-                .pinpointLocalizer(localizerConstants)
+                .pinpointLocalizer(localizerConstants())
                 .pathConstraints(pathConstraints)
-                .mecanumDrivetrain(driveConstants)
+                .mecanumDrivetrain(driveConstants())
                 .build();
     }
 }

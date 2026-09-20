@@ -31,6 +31,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.team00000.Hardware;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,6 +105,7 @@ public class Tuning extends SelectableOpMode {
         follower = Constants.createFollower(hardwareMap);
         PanelsConfigurables.INSTANCE.refreshClass(this);
         PanelsConfigurables.INSTANCE.refreshClass(Constants.class);
+        PanelsConfigurables.INSTANCE.refreshClass(Hardware.Config.class);
 
         follower.setStartingPose(new Pose());
 
