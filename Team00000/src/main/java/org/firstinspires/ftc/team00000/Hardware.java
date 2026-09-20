@@ -128,7 +128,6 @@ public class Hardware {
 
     private void initPinpoint (HardwareMap hardwareMap) {
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, PINPOINT_NAME);
-
         pinpoint.setOffsets(PINPOINT_X_OFFSET_MM, PINPOINT_Y_OFFSET_MM, DistanceUnit.MM);
         pinpoint.setEncoderResolution(PODS);
         pinpoint.setEncoderDirections(X_ENCODER_DIRECTION, Y_ENCODER_DIRECTION);

@@ -89,24 +89,39 @@ public class Tuning extends SelectableOpMode {
         });
     }
 
+    private static void ensureTelemetry() {
+        if (telemetryM == null) {
+            telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
+        }
+    }
+
     @Override
     public void onSelect() {
-        if (follower == null) {
-            follower = Constants.createFollower(hardwareMap);
-            PanelsConfigurables.INSTANCE.refreshClass(this);
-        } else {
-            follower = Constants.createFollower(hardwareMap);
-        }
+        Drawing.init();
+        ensureTelemetry();
+
+        follower = Constants.createFollower(hardwareMap);
+        PanelsConfigurables.INSTANCE.refreshClass(this);
+        PanelsConfigurables.INSTANCE.refreshClass(Constants.class);
 
         follower.setStartingPose(new Pose());
 
         poseHistory = follower.getPoseHistory();
-
-        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
     }
 
+    /**
+     * SelectableOpMode prints the tuner menu to Driver Station telemetry during init_loop.
+     * Forward those same lines to Panels so the menu (and later init telemetry) is visible
+     * before START is pressed.
+     */
     @Override
-    public void onLog(List<String> lines) {}
+    public void onLog(List<String> lines) {
+        ensureTelemetry();
+        for (String line : lines) {
+            telemetryM.addLine(line);
+        }
+        telemetryM.update();
+    }
 
     public static void drawCurrent() {
         try {
