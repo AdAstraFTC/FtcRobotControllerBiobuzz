@@ -6,11 +6,12 @@
 
 package org.firstinspires.ftc.team00000.autonomous;
 
+import static com.pedropathing.api.Paths.line;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.PathChain;
+import com.pedropathing.math.Pose;
+import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
@@ -19,14 +20,12 @@ import org.firstinspires.ftc.team00000.pedroPathing.Constants;
 /**
  * Simple autonomous: drive forward a fixed distance and stop.
  *
- * <p>This uses Pedro Pathing's {@link Follower}, which already owns the mecanum
- * motors and Pinpoint. Do not also construct {@code Hardware} in this OpMode —
- * that would initialize the same devices twice. Wiring still comes from
- * {@code Hardware.Config} through {@link Constants#createFollower}.</p>
+ * <p>Uses Pedro Pathing 3's {@link Follower}, which owns the mecanum motors
+ * and Pinpoint. Do not also construct {@code Hardware} here. Wiring still
+ * comes from {@code Hardware.Config} through {@link Constants#create}.</p>
  *
- * <p><b>Setup:</b> place the robot with a clear path ahead. Heading 0 is +X
- * (straight forward from the starting pose). This is robot-start-relative, not
- * a full FTC field coordinate auto.</p>
+ * <p>Place the robot with a clear path ahead. Heading 0 is +X from the
+ * starting pose (robot-start-relative, not a full field auto).</p>
  */
 @Configurable
 @Autonomous(name = "Forward", group = "Autonomous")
@@ -36,14 +35,12 @@ public class Forward extends OpMode {
     /** Distance to drive, in inches. Edit here or live-tune from Panels. */
     public static double FORWARD_INCHES = 24.0;
 
-    private final Pose startPose = new Pose(0, 0, Math.toRadians(0));
-
     private Follower follower;
 
     @Override
     public void init() {
-        follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startPose);
+        follower = Constants.create(hardwareMap);
+        follower.setPose(Pose.zero());
     }
 
     @Override
@@ -58,15 +55,11 @@ public class Forward extends OpMode {
 
     @Override
     public void start() {
-        Pose endPose = new Pose(FORWARD_INCHES, 0, startPose.getHeading());
+        Pose endPose = new Pose(FORWARD_INCHES, 0, 0);
+        Path forward = line(Pose.zero(), endPose).constant(0);
 
-        PathChain forward = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, endPose))
-                .setConstantHeadingInterpolation(startPose.getHeading())
-                .build();
-
-        follower.activateAllPIDFs();
-        follower.followPath(forward, true);
+        follower.holdEnd.set(true);
+        follower.follow(forward);
     }
 
     @Override
@@ -82,15 +75,15 @@ public class Forward extends OpMode {
     @Override
     public void stop() {
         if (follower != null) {
-            follower.breakFollowing();
+            follower.stop();
         }
     }
 
     private void addPoseTelemetry() {
-        Pose pose = follower.getPose();
+        Pose pose = follower.pose();
         telemetry.addData("Pose (in)", "X %.2f Y %.2f H %.1f deg",
-                pose.getX(),
-                pose.getY(),
-                Math.toDegrees(pose.getHeading()));
+                pose.x(),
+                pose.y(),
+                Math.toDegrees(pose.heading()));
     }
 }
