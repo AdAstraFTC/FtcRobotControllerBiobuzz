@@ -30,6 +30,7 @@ import org.firstinspires.ftc.team00000.pedroPathing.Constants;
  */
 @Configurable
 @Autonomous(name = "Forward", group = "Autonomous")
+@SuppressWarnings("unused") // Instantiated by the FTC SDK from the @Autonomous annotation.
 public class Forward extends OpMode {
 
     /** Distance to drive, in inches. Edit here or live-tune from Panels. */
@@ -38,8 +39,6 @@ public class Forward extends OpMode {
     private final Pose startPose = new Pose(0, 0, Math.toRadians(0));
 
     private Follower follower;
-    private PathChain forward;
-    private boolean finished;
 
     @Override
     public void init() {
@@ -61,7 +60,7 @@ public class Forward extends OpMode {
     public void start() {
         Pose endPose = new Pose(FORWARD_INCHES, 0, startPose.getHeading());
 
-        forward = follower.pathBuilder()
+        PathChain forward = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, endPose))
                 .setConstantHeadingInterpolation(startPose.getHeading())
                 .build();
@@ -74,11 +73,7 @@ public class Forward extends OpMode {
     public void loop() {
         follower.update();
 
-        if (!follower.isBusy()) {
-            finished = true;
-        }
-
-        telemetry.addData("State", finished ? "DONE" : "DRIVING");
+        telemetry.addData("State", follower.isBusy() ? "DRIVING" : "DONE");
         telemetry.addData("Target (in)", FORWARD_INCHES);
         addPoseTelemetry();
         telemetry.update();
