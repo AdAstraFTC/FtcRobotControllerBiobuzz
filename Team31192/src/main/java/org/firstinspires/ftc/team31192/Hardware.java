@@ -62,8 +62,8 @@ public class Hardware {
     public static final DcMotor.Direction FLYWHEEL_DIRECTION = DcMotor.Direction.FORWARD;
 
     /** Held power while testing direction. Raise this after the spin direction is confirmed. */
-    public static final double INTAKE_POWER = 0.5;
-    public static final double KICKER_POWER = 0.5;
+    public static final double INTAKE_POWER = 1.0;
+    public static final double KICKER_POWER = 1.0;
     public static final double FLYWHEEL_POWER = 0.5;
     public static final double SPINE_POLLEN_POSITION = 0.5;
     public static final double SPINE_NECTAR_POSITION = 0.0;
