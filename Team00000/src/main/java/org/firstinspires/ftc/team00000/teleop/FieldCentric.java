@@ -8,7 +8,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.team00000.Hardware;
 
 @TeleOp(name = "FieldCentric", group = "TeleOp")
-@SuppressWarnings("unused") // Instantiated by the FTC SDK from the @Autonomous annotation.
 public class FieldCentric extends OpMode {
 
     private Hardware hardware;
