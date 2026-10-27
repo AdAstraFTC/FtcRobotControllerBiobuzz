@@ -35,7 +35,7 @@ import org.firstinspires.ftc.team00000.Hardware;
 public class Forward extends OpMode {
 
     /** Distance to drive along Pinpoint +X, in inches. */
-    public static double FORWARD_INCHES = 24.0;
+    public static double FORWARD_INCHES = 100.0;
 
     /** Cruise power while the target is farther than {@link #SLOW_DOWN_INCHES}. */
     public static double MAX_POWER = 0.40;
@@ -44,7 +44,7 @@ public class Forward extends OpMode {
      * Inside this distance, translation power falls from {@link #MAX_POWER}
      * toward {@link #MIN_POWER}. Raise it if the robot overshoots.
      */
-    public static double SLOW_DOWN_INCHES = 18.0;
+    public static double SLOW_DOWN_INCHES = 6.0;
 
     /** Translation power floor outside the position tolerance, so friction does not stall the approach. */
     public static double MIN_POWER = 0.12;

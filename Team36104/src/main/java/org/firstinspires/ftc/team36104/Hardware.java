@@ -35,7 +35,7 @@ public class Hardware {
     public static final DcMotor.Direction FRONT_LEFT_DIRECTION = DcMotor.Direction.REVERSE;
     public static final DcMotor.Direction FRONT_RIGHT_DIRECTION = DcMotor.Direction.FORWARD;
     public static final DcMotor.Direction BACK_LEFT_DIRECTION = DcMotor.Direction.REVERSE;
-    public static final DcMotor.Direction BACK_RIGHT_DIRECTION = DcMotor.Direction.REVERSE;
+    public static final DcMotor.Direction BACK_RIGHT_DIRECTION = DcMotor.Direction.FORWARD;
 
     /*
      * REV HUB ORIENTATION ON THE ROBOT
@@ -53,7 +53,7 @@ public class Hardware {
     private static final RevHubOrientationOnRobot.LogoFacingDirection LOGO_FACING =
             RevHubOrientationOnRobot.LogoFacingDirection.UP;
     private static final RevHubOrientationOnRobot.UsbFacingDirection USB_FACING =
-            RevHubOrientationOnRobot.UsbFacingDirection.LEFT;
+            RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
 
     /* =====================================================
      * CONSTRUCTOR

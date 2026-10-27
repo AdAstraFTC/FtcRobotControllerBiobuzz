@@ -20,6 +20,8 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver.EncoderDirection;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver.GoBildaOdometryPods;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PwmControl;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -30,8 +32,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 /**
  * Hardware - Primary hardware abstraction for the mentor bot.
  *
- * <p>Provides a clean, reusable interface for controlling four mecanum drive motors
- * and reading pose data from the goBILDA Pinpoint odometry computer.</p>
+ * <p>Provides a clean, reusable interface for controlling four mecanum drive motors,
+ * a 1150 RPM launcher flywheel, a 5-turn launcher servo, and the goBILDA Pinpoint.</p>
  *
  * <p>{@link Config} is the source of truth for teleop and Pedro Pathing.
  * {@code org.firstinspires.ftc.team00000.pedro.Constants} reads these fields.
@@ -92,6 +94,33 @@ public class Hardware {
          */
         public static EncoderDirection FORWARD_ENCODER_DIRECTION = EncoderDirection.FORWARD;
         public static EncoderDirection STRAFE_ENCODER_DIRECTION = EncoderDirection.REVERSED;
+
+        /*
+         * LAUNCHER
+         *
+         * flywheel: goBILDA Yellow Jacket, 5.2:1, 1150 RPM no-load.
+         * Open loop. The motor encoder is not used. Full power is FLYWHEEL_POWER.
+         *
+         * launcherServo: goBILDA 2000-series 5-turn torque servo (default servo mode).
+         * The servo's full 5 turns are 500–2500 μs. The 6V injector does not power its
+         * output until the pulse is wider than 500 μs, so the low end here is 505 μs.
+         * Position 0 is pollen and 0.075 is nectar. The servo goes to pollen at init.
+         * Increasing pulse width turns the spline clockwise. Flip LAUNCHER_SERVO_DIRECTION
+         * if the servo moves the wrong way.
+         */
+        public static String FLYWHEEL_NAME = "flywheel";
+        public static String SPINE_SERVO_NAME = "spine";
+
+        public static DcMotor.Direction FLYWHEEL_DIRECTION = DcMotor.Direction.FORWARD;
+        public static Servo.Direction LAUNCHER_SERVO_DIRECTION = Servo.Direction.FORWARD;
+
+        public static double FLYWHEEL_POWER = 1.0;
+
+        public static double LAUNCHER_SERVO_TURNS = 5.0;
+        public static double LAUNCHER_SERVO_PWM_MIN_US = 505;
+        public static double LAUNCHER_SERVO_PWM_MAX_US = 2500;
+        public static double LAUNCHER_SERVO_POLLEN = 0.000;
+        public static double LAUNCHER_SERVO_NECTAR = 0.075;
     }
 
     /* =====================================================
@@ -101,6 +130,8 @@ public class Hardware {
     private final DcMotor frontRightDrive;
     private final DcMotor backLeftDrive;
     private final DcMotor backRightDrive;
+    private final DcMotor flywheel;
+    private final Servo launcherServo;
     private final GoBildaPinpointDriver pinpoint;
 
     /* =====================================================
@@ -111,10 +142,13 @@ public class Hardware {
         frontRightDrive = hardwareMap.get(DcMotor.class, Config.FRONT_RIGHT_NAME);
         backLeftDrive = hardwareMap.get(DcMotor.class, Config.BACK_LEFT_NAME);
         backRightDrive = hardwareMap.get(DcMotor.class, Config.BACK_RIGHT_NAME);
+        flywheel = hardwareMap.get(DcMotor.class, Config.FLYWHEEL_NAME);
+        launcherServo = hardwareMap.get(Servo.class, Config.SPINE_SERVO_NAME);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, Config.PINPOINT_NAME);
 
         initDriveMotors();
         initPinpoint();
+        initLauncher();
     }
 
     /* =====================================================
@@ -163,6 +197,22 @@ public class Hardware {
          * the Driver Station shows READY before pressing START.
          */
         pinpoint.resetPosAndIMU();
+    }
+
+    private void initLauncher() {
+        flywheel.setDirection(Config.FLYWHEEL_DIRECTION);
+        // Coast when the test releases the wheel. Brake would slam a spinning flywheel.
+        flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        flywheel.setPower(0.0);
+
+        launcherServo.setDirection(Config.LAUNCHER_SERVO_DIRECTION);
+        if (launcherServo instanceof PwmControl) {
+            ((PwmControl) launcherServo).setPwmRange(new PwmControl.PwmRange(
+                    Config.LAUNCHER_SERVO_PWM_MIN_US,
+                    Config.LAUNCHER_SERVO_PWM_MAX_US));
+        }
+        setLauncherServoPosition(Config.LAUNCHER_SERVO_POLLEN);
     }
 
     /* =====================================================
@@ -247,6 +297,43 @@ public class Hardware {
     }
 
     /* =====================================================
+     * PUBLIC LAUNCHER API
+     * ===================================================== */
+
+    /**
+     * Open-loop flywheel power. Positive follows {@link Config#FLYWHEEL_DIRECTION}.
+     * The motor encoder is not used.
+     */
+    public void setFlywheelPower(double power) {
+        flywheel.setPower(Range.clip(power, -1.0, 1.0));
+    }
+
+    /** Coasts the flywheel. Does not brake. */
+    public void stopFlywheel() {
+        flywheel.setPower(0.0);
+    }
+
+    public double getFlywheelPower() {
+        return flywheel.getPower();
+    }
+
+    /**
+     * Commands the 5-turn servo. 0 is one end of travel, 1 is the other end.
+     */
+    public void setLauncherServoPosition(double position) {
+        launcherServo.setPosition(Range.clip(position, 0.0, 1.0));
+    }
+
+    public double getLauncherServoPosition() {
+        return launcherServo.getPosition();
+    }
+
+    /** Commanded servo travel in turns. This servo does not report measured angle. */
+    public double getLauncherServoTurns() {
+        return getLauncherServoPosition() * Config.LAUNCHER_SERVO_TURNS;
+    }
+
+    /* =====================================================
      * PUBLIC ODOMETRY / PINPOINT API
      * ===================================================== */
 
@@ -324,6 +411,16 @@ public class Hardware {
                 pose.getX(distUnit),
                 pose.getY(distUnit),
                 pose.getHeading(angleUnit));
+    }
+
+    public void addLauncherTelemetry(Telemetry telemetry) {
+        telemetry.addData("Flywheel", "power %.2f", getFlywheelPower());
+        double pulseUs = Config.LAUNCHER_SERVO_PWM_MIN_US
+                + getLauncherServoPosition()
+                * (Config.LAUNCHER_SERVO_PWM_MAX_US - Config.LAUNCHER_SERVO_PWM_MIN_US);
+        telemetry.addData("Launcher servo", "%.3f   %.0f us",
+                getLauncherServoPosition(),
+                pulseUs);
     }
 
     /**
