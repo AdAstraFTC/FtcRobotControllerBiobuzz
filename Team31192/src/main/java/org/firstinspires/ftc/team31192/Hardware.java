@@ -59,7 +59,7 @@ public class Hardware {
 
     public static final DcMotor.Direction INTAKE_DIRECTION = DcMotor.Direction.FORWARD;
     public static final DcMotor.Direction KICKER_DIRECTION = DcMotor.Direction.REVERSE;
-    public static final DcMotor.Direction FLYWHEEL_DIRECTION = DcMotor.Direction.FORWARD;
+    public static final DcMotor.Direction FLYWHEEL_DIRECTION = DcMotor.Direction.REVERSE;
 
     /** Held power while testing direction. Raise this after the spin direction is confirmed. */
     public static final double INTAKE_POWER = 1.0;
