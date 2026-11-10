@@ -22,6 +22,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -39,13 +40,15 @@ public class Hardware {
     private DcMotor kickerMotor = null;
     private DcMotor flywheelMotor = null;
     private Servo launcherSpine = null;
+    private Servo rampServo = null;
     private GoBildaPinpointDriver pinpoint = null;
 
     /* =====================================================
      * CONFIGURATION CONSTANTS
      *
      * These values are centralized here so they only need to be changed in one place.
-     * Motor names must match the Driver Station configuration exactly.
+     * Motor names
+     * must match the Driver Station configuration exactly.
      * ===================================================== */
     public static final String FRONT_LEFT_NAME = "frontLeftDrive";
     public static final String FRONT_RIGHT_NAME = "frontRightDrive";
@@ -55,6 +58,7 @@ public class Hardware {
     public static final String KICKER_NAME = "kickerMotor";
     public static final String FLYWHEEL_NAME = "flywheelMotor";
     public static final String LAUNCHER_SPINE_NAME = "launcherSpine";
+    public static final String RAMP_SERVO_NAME = "rampServo";
     public static final String PINPOINT_NAME = "pinpoint";
 
     public static final DcMotor.Direction INTAKE_DIRECTION = DcMotor.Direction.FORWARD;
@@ -67,7 +71,9 @@ public class Hardware {
     public static final double FLYWHEEL_POWER = 0.5;
     public static final double SPINE_POLLEN_POSITION = 0.5;
     public static final double SPINE_NECTAR_POSITION = 0.0;
-
+    public static final double RAMP_RETRACTED = 0.0;
+    //RAMP_EXTENDED value will change
+    public static final double RAMP_EXTENDED = 0.1;
     public static final DcMotor.Direction FRONT_LEFT_DIRECTION = DcMotor.Direction.REVERSE;
     public static final DcMotor.Direction FRONT_RIGHT_DIRECTION = DcMotor.Direction.FORWARD;
     public static final DcMotor.Direction BACK_LEFT_DIRECTION = DcMotor.Direction.REVERSE;
@@ -103,7 +109,7 @@ public class Hardware {
         initDriveMotors(hardwareMap);
         initIntakeMotors(hardwareMap);
         initFlywheelMotors(hardwareMap);
-        initLauncherSpine(hardwareMap);
+        initRampServo(hardwareMap);
         initPinpoint(hardwareMap);
     }
 
@@ -169,6 +175,11 @@ public class Hardware {
     private void initLauncherSpine (HardwareMap hardwareMap) {
         launcherSpine = hardwareMap.get(Servo.class, LAUNCHER_SPINE_NAME);
         launcherSpine.setPosition(SPINE_POLLEN_POSITION);
+    }
+
+    public void initRampServo (HardwareMap hardwareMap) {
+        rampServo = hardwareMap.get(Servo.class, RAMP_SERVO_NAME);
+        rampServo.setPosition(RAMP_RETRACTED);
     }
 
     private void initPinpoint (HardwareMap hardwareMap) {
@@ -338,6 +349,18 @@ public class Hardware {
             setLauncherSpinePosition(SPINE_POLLEN_POSITION);
         }
     }
+
+    public void setRampPosition(double position) {
+        rampServo.setPosition(Range.clip(position, 0.0, 1.0));
+    }
+
+    public void runRamp(boolean extend, boolean retract) {
+        if (extend) {
+            setRampPosition(RAMP_EXTENDED);
+        } else if (retract) {
+            setRampPosition(RAMP_RETRACTED);
+        }
+    }
     /* =====================================================
      * PUBLIC ODOMETRY / PINPOINT API
      * ===================================================== */
@@ -420,6 +443,7 @@ public class Hardware {
         telemetry.addData("Kicker", "%.2f", kickerMotor.getPower());
         telemetry.addData("Flywheel", "%.2f", flywheelMotor.getPower());
         telemetry.addData("Spine", "%.2f", launcherSpine.getPosition());
+        telemetry.addData("Ramp", "%.2f", rampServo.getPosition());
     }
 
     public void addDriveTelemetry(org.firstinspires.ftc.robotcore.external.Telemetry telemetry) {
@@ -437,5 +461,15 @@ public class Hardware {
                 pose.getX(distUnit),
                 pose.getY(distUnit),
                 pose.getHeading(angleUnit));
+    }
+
+    /**
+     * Pinpoint calibration status for {@code init_loop()}. Wait until READY
+     * before pressing START if field-centric heading is required.
+     */
+    public void addInitTelemetry(Telemetry telemetry) {
+        GoBildaPinpointDriver.DeviceStatus status = pinpoint.getDeviceStatus();
+        telemetry.addData("Pinpoint", isPinpointReady() ? "READY - press START" : status.toString());
+        addPoseTelemetry(telemetry, DistanceUnit.MM, AngleUnit.DEGREES);
     }
 }

@@ -30,6 +30,7 @@ public class FieldCentric extends OpMode {
         runIntake();
         runFlywheel();
         runLauncherSpine();
+        runRamp();
 
         // Telemetry
         hardware.addDriveTelemetry(telemetry);
@@ -66,5 +67,10 @@ public class FieldCentric extends OpMode {
         hardware.runLauncherSpine(
                 gamepad2.dpad_up,
                 gamepad2.dpad_left);
+    }
+
+    public void runRamp () {
+        hardware.runRamp(
+                gamepad2.right_trigger > 0.5, gamepad2.left_trigger > 0.5);
     }
 }
