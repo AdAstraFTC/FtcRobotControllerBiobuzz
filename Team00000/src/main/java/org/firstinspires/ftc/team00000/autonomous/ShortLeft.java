@@ -38,21 +38,17 @@ import java.util.List;
  * <p>Gains are starting values. Tune them from Panels on the field.</p>
  */
 @Configurable
-@Autonomous(name = "Forward", group = "Autonomous")
+@Autonomous(name = "Short Left", group = "Autonomous")
 @SuppressWarnings("unused") // Instantiated by the FTC SDK from the @Autonomous annotation.
-public class Forward extends OpMode {
-
-    /** Length of the default forward path, in inches. */
-    public static double FORWARD_INCHES = 24.0;
-
+public class ShortLeft extends OpMode {
     /** Cruise power while the target is farther than {@link #SLOW_DOWN_INCHES}. */
-    public static double MAX_POWER = 0.40;
+    public static double MAX_POWER = 0.65;
 
     /**
      * Inside this distance, translation power falls from {@link #MAX_POWER}
      * toward {@link #MIN_POWER}. Raise it if the robot overshoots.
      */
-    public static double SLOW_DOWN_INCHES = 18.0;
+    public static double SLOW_DOWN_INCHES = 6.0;
 
     /** Translation power floor outside the position tolerance, so friction does not stall the approach. */
     public static double MIN_POWER = 0.12;
@@ -101,9 +97,7 @@ public class Forward extends OpMode {
      */
     private PathBuilder buildPath() {
         return new PathBuilder()
-                .linear(24, 0)
-                .pause(1.0)
-                .linear(24,45);
+                .linear(-24, 90);
     }
 
     @Override

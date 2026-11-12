@@ -71,9 +71,8 @@ public class Hardware {
     public static final double FLYWHEEL_POWER = 0.5;
     public static final double SPINE_POLLEN_POSITION = 0.5;
     public static final double SPINE_NECTAR_POSITION = 0.0;
-    public static final double RAMP_RETRACTED = 0.0;
-    //RAMP_EXTENDED value will change
-    public static final double RAMP_EXTENDED = 0.1;
+    public static final double RAMP_RETRACTED = 0.61;
+    public static final double RAMP_EXTENDED = 1.0;
     public static final DcMotor.Direction FRONT_LEFT_DIRECTION = DcMotor.Direction.REVERSE;
     public static final DcMotor.Direction FRONT_RIGHT_DIRECTION = DcMotor.Direction.FORWARD;
     public static final DcMotor.Direction BACK_LEFT_DIRECTION = DcMotor.Direction.REVERSE;
@@ -109,6 +108,7 @@ public class Hardware {
         initDriveMotors(hardwareMap);
         initIntakeMotors(hardwareMap);
         initFlywheelMotors(hardwareMap);
+        initLauncherSpine(hardwareMap);
         initRampServo(hardwareMap);
         initPinpoint(hardwareMap);
     }
