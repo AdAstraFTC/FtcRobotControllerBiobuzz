@@ -10,7 +10,6 @@ import com.pedropathing.revhub.drivetrains.Mecanum;
 import com.pedropathing.revhub.drivetrains.MecanumConfig;
 import com.pedropathing.revhub.localizers.PinpointConfig;
 import com.pedropathing.revhub.localizers.PinpointLocalizer;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -19,9 +18,8 @@ import org.firstinspires.ftc.team36103.Hardware;
 /**
  * Pedro Pathing 3 follower for Team 36103.
  *
- * <p>Drive motor names and directions come from {@link Hardware}. This robot's
- * Hardware class uses the hub IMU and does not own a Pinpoint, so the Pinpoint
- * block below stays in Pedro until that device is added to Hardware.</p>
+ * <p>Drive motor names, directions, and Pinpoint geometry come from {@link Hardware}.
+ * Foresight coefficients stay here. Poses are in inches.</p>
  */
 public class Constants {
     public static MecanumConfig drivetrainConfig = new MecanumConfig(c -> {
@@ -36,13 +34,14 @@ public class Constants {
     });
 
     public static PinpointConfig localizerConfig = new PinpointConfig(c -> {
-        c.name.set("pinpoint");
-        c.podType.set(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        c.xPodOffset.set(-153.50);
-        c.yPodOffset.set(56.00);
-        c.xPodDirection.set(GoBildaPinpointDriver.EncoderDirection.FORWARD);
-        c.yPodDirection.set(GoBildaPinpointDriver.EncoderDirection.REVERSED);
-        c.offsetUnits.set(DistanceUnit.MM);
+        c.name.set(Hardware.PINPOINT_NAME);
+        c.podType.set(Hardware.PODS);
+        // setOffsets(x, y): x is the forward pod's sideways offset, y is the strafe pod's forward offset.
+        c.xPodOffset.set(Hardware.FORWARD_POD_Y_MM);
+        c.yPodOffset.set(Hardware.STRAFE_POD_X_MM);
+        c.xPodDirection.set(Hardware.FORWARD_ENCODER_DIRECTION);
+        c.yPodDirection.set(Hardware.STRAFE_ENCODER_DIRECTION);
+        c.offsetUnits.set(Hardware.PINPOINT_DISTANCE_UNIT);
         c.globalDistanceUnit.set(DistanceUnit.INCH);
     });
 
