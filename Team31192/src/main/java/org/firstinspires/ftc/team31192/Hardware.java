@@ -71,7 +71,7 @@ public class Hardware {
     public static final double FLYWHEEL_POWER = 0.5;
     public static final double SPINE_POLLEN_POSITION = 0.5;
     public static final double SPINE_NECTAR_POSITION = 0.0;
-    public static final double RAMP_RETRACTED = 0.61;
+    public static final double RAMP_RETRACTED = 0.21;
     public static final double RAMP_EXTENDED = 1.0;
     public static final DcMotor.Direction FRONT_LEFT_DIRECTION = DcMotor.Direction.REVERSE;
     public static final DcMotor.Direction FRONT_RIGHT_DIRECTION = DcMotor.Direction.FORWARD;
