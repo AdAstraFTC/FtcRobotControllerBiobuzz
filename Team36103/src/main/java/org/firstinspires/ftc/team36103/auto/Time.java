@@ -62,6 +62,8 @@ public class Time extends LinearOpMode {
     private DcMotor         frontRightDrive = null;
     private DcMotor         backLeftDrive  = null;
     private DcMotor         backRightDrive  = null;
+    private DcMotor         leftCatapult  = null;
+    private DcMotor         rightCatapult  = null;
 
     private ElapsedTime     runtime = new ElapsedTime();
 
@@ -77,6 +79,9 @@ public class Time extends LinearOpMode {
         frontRightDrive = hardwareMap.get(DcMotor.class, "frontRightDrive");
         backRightDrive = hardwareMap.get(DcMotor.class, "backRightDrive");
         backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDrive");
+        backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDrive");
+        leftCatapult = hardwareMap.get(DcMotor.class, "leftCatapult");
+        rightCatapult = hardwareMap.get(DcMotor.class, "rightCatapult");
         // name of catapults leftCatapult rightCatapult
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
@@ -119,15 +124,32 @@ public class Time extends LinearOpMode {
         }
 
         // Step 3:  Drive Backward for 1 Second
-        frontLeftDrive.setPower(-FORWARD_SPEED);
-        frontRightDrive.setPower(-FORWARD_SPEED);
-        backRightDrive.setPower(-FORWARD_SPEED);
-        backLeftDrive.setPower(-FORWARD_SPEED);
+        frontLeftDrive.setPower(FORWARD_SPEED);
+        frontRightDrive.setPower(FORWARD_SPEED);
+        backRightDrive.setPower(FORWARD_SPEED);
+        backLeftDrive.setPower(FORWARD_SPEED);
         runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 0.2)) {
+        while (opModeIsActive() && (runtime.seconds() < 0.5)) {
             telemetry.addData("Path", "Leg 3: %4.1f S Elapsed", runtime.seconds());
             telemetry.update();
         }
+
+        frontLeftDrive.setPower(TURN_SPEED);
+        frontRightDrive.setPower(-TURN_SPEED);
+        backRightDrive.setPower(-TURN_SPEED);
+        backLeftDrive.setPower(TURN_SPEED);
+        runtime.reset();
+        while (opModeIsActive() && (runtime.seconds() < 0.2)) {
+            telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
+            telemetry.update();
+        }
+
+        leftCatapult.setPower(1);
+        rightCatapult.setPower(1);
+        while (opModeIsActive() && (runtime.seconds() < 0.2)) {
+            telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
+            telemetry.update();
+
 
         // Step 4:  Stop
         frontLeftDrive.setPower(0);
