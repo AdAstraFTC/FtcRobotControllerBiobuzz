@@ -58,18 +58,18 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class Time extends LinearOpMode {
 
     /* Declare OpMode members. */
-    private DcMotor         frontLeftDrive   = null;
-    private DcMotor         frontRightDrive = null;
-    private DcMotor         backLeftDrive  = null;
-    private DcMotor         backRightDrive  = null;
-    private DcMotor         leftCatapult  = null;
-    private DcMotor         rightCatapult  = null;
+    private DcMotor frontLeftDrive = null;
+    private DcMotor frontRightDrive = null;
+    private DcMotor backLeftDrive = null;
+    private DcMotor backRightDrive = null;
+    private DcMotor leftCatapult = null;
+    private DcMotor rightCatapult = null;
 
-    private ElapsedTime     runtime = new ElapsedTime();
+    private ElapsedTime runtime = new ElapsedTime();
 
 
-    static final double     FORWARD_SPEED = 1;
-    static final double     TURN_SPEED    = 1;
+    static final double FORWARD_SPEED = 1;
+    static final double TURN_SPEED = 1;
 
     @Override
     public void runOpMode() {
@@ -81,7 +81,7 @@ public class Time extends LinearOpMode {
         backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDrive");
         backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDrive");
         leftCatapult = hardwareMap.get(DcMotor.class, "leftCatapult");
-        rightCatapult = hardwareMap.get(DcMotor.class, "rightCatapult");
+        rightCatapult = hardwareMap.get(DcMotor.class, "backLeftDrive");
         // name of catapults leftCatapult rightCatapult
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
@@ -151,14 +151,15 @@ public class Time extends LinearOpMode {
             telemetry.update();
 
 
-        // Step 4:  Stop
-        frontLeftDrive.setPower(0);
-        frontRightDrive.setPower(0);
-        backRightDrive.setPower(0);
-        backLeftDrive.setPower(0);
+            // Step 4:  Stop
+            frontLeftDrive.setPower(0);
+            frontRightDrive.setPower(0);
+            backRightDrive.setPower(0);
+            backLeftDrive.setPower(0);
 
-        telemetry.addData("Path", "Complete");
-        telemetry.update();
-        sleep(1000);
+            telemetry.addData("Path", "Complete");
+            telemetry.update();
+            sleep(1000);
+        }
     }
 }
