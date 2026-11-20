@@ -78,9 +78,9 @@ public class Hardware {
     public static final double CATAPULT_HOLD_POWER = 0.0;
 
     /** Milliseconds the shot power is applied before the automatic return. */
-    public static final double CATAPULT_RUN_MS = 250;
+    public static final double CATAPULT_RUN_MS = 150;
     /** Milliseconds of down power after a shot. Increase if the arm does not seat. */
-    public static final double CATAPULT_RETURN_MS = 300;
+    public static final double CATAPULT_RETURN_MS = 200;
 
     /** Positional servo travel. Horn offsets are baked into the start angles. */
     public static final double SERVO_RANGE_DEG = 270.0;
@@ -438,6 +438,11 @@ public class Hardware {
         catapultMode = CatapultMode.HOLD;
         catapultActivePower = CATAPULT_HOLD_POWER;
         setCatapultPower(CATAPULT_HOLD_POWER);
+    }
+
+    /** True during the shot stroke and the return stroke. */
+    public boolean isCatapultRunning() {
+        return catapultRunning;
     }
 
     /**

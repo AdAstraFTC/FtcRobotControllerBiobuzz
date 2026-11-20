@@ -31,138 +31,84 @@ package org.firstinspires.ftc.team36103.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.team36103.Hardware;
 
-/*
- * This OpMode illustrates the concept of driving a path based on time.
- * The code is structured as a LinearOpMode
+/**
+ * Timed robot-centric drive, then one catapult shot.
  *
- * The code assumes that you do NOT have encoders on the wheels,
- *   otherwise you would use: RobotAutoDriveByEncoder;
- *
- *   The desired path in this example is:
- *   - Drive forward for 3 seconds
- *   - Spin right for 1.3 seconds
- *   - Drive Backward for 1 Second
- *
- *  The code is written in a simple form with no optimizations.
- *  However, there are several ways that this type of sequence could be streamlined,
- *
- * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
+ * <p>Drive power goes through {@link Hardware#driveRobotCentric}. The shot
+ * goes through {@link Hardware#runCatapult}, the same up-then-return sequence
+ * teleop uses. This OpMode only chooses when the shot starts. Hardware owns
+ * the stroke times and powers. The robot is stopped before the shot.</p>
  */
-
-@Autonomous(name="Time", group="Robot")
-
+@Autonomous(name = "Time", group = "Robot")
 public class Time extends LinearOpMode {
+
+    private static final double FORWARD_POWER = 1.0;
+    private static final double TURN_POWER = 1.0;
+
+    private static final double LEG1_SECONDS = 1.5;
+    private static final double LEG2_SECONDS = 0.3;
+    private static final double LEG3_SECONDS = 0.5;
+    private static final double LEG4_SECONDS = 0.3;
+
     private Hardware hardware;
-
-    /* Declare OpMode members. */
-    private DcMotor frontLeftDrive = null;
-    private DcMotor frontRightDrive = null;
-    private DcMotor backLeftDrive = null;
-    private DcMotor backRightDrive = null;
-    private DcMotor leftCatapult = null;
-    private DcMotor rightCatapult = null;
-
-    private ElapsedTime runtime = new ElapsedTime();
-
-    static final double FORWARD_SPEED = 1;
-    static final double TURN_SPEED = 1;
+    private final ElapsedTime runtime = new ElapsedTime();
 
     @Override
     public void runOpMode() {
+        hardware = new Hardware(hardwareMap);
+        hardware.stopDrive();
+        hardware.stopCatapult();
 
-        // Initialize the drive system variables.
-        frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDrive");
-        frontRightDrive = hardwareMap.get(DcMotor.class, "frontRightDrive");
-        backRightDrive = hardwareMap.get(DcMotor.class, "backRightDrive");
-        backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDrive");
-        backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDrive");
-        leftCatapult = hardwareMap.get(DcMotor.class, "leftCatapult");
-        rightCatapult = hardwareMap.get(DcMotor.class, "backLeftDrive");
-        // name of catapults leftCatapult rightCatapult
-        // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
-        // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
-        // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
-
-
-        // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Ready to run");    //
+        telemetry.addLine("Forward 1.5s, spin right 0.3s, forward 0.5s, spin right 0.3s, 1-ball shot.");
         telemetry.update();
 
-        // Wait for the game to start (driver presses START)
         waitForStart();
 
-        // Step through each leg of the path, ensuring that the OpMode has not been stopped along the way.
+        try {
+            driveFor(FORWARD_POWER, 0.0, 0.0, LEG1_SECONDS, "Forward");
+            driveFor(0.0, 0.0, TURN_POWER, LEG2_SECONDS, "Spin right");
+            driveFor(FORWARD_POWER, 0.0, 0.0, LEG3_SECONDS, "Forward");
+            driveFor(0.0, 0.0, TURN_POWER, LEG4_SECONDS, "Spin right");
+            // Arguments are 4-ball, 3-ball, 2-ball, 1-ball. The first true value wins.
+            fireShot(false, false, false, true);
+        } finally {
+            hardware.stopDrive();
+            hardware.stopCatapult();
+        }
+    }
 
-        // Step 1:  Drive forward for 3 seconds
-        frontLeftDrive.setPower(FORWARD_SPEED);
-        frontRightDrive.setPower(FORWARD_SPEED);
-        backRightDrive.setPower(FORWARD_SPEED);
-        backLeftDrive.setPower(FORWARD_SPEED);
+    /**
+     * Holds one robot-centric command until {@code seconds} elapses.
+     * The catapult stays in hold for the whole leg.
+     */
+    private void driveFor(double axial, double lateral, double yaw, double seconds, String leg) {
         runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 1.5)) {
-            telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
+        while (opModeIsActive() && runtime.seconds() < seconds) {
+            hardware.driveRobotCentric(axial, lateral, yaw);
+            hardware.runCatapult(false, false, false, false, false);
+            telemetry.addData("Path", "%s  %.1f s", leg, runtime.seconds());
+            hardware.addDriveTelemetry(telemetry);
             telemetry.update();
         }
+        hardware.stopDrive();
+    }
 
-        // Step 2:  Spin right for 1.3 seconds
-        frontLeftDrive.setPower(TURN_SPEED);
-        frontRightDrive.setPower(-TURN_SPEED);
-        backRightDrive.setPower(-TURN_SPEED);
-        backLeftDrive.setPower(TURN_SPEED);
-        runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 0.3)) {
-            telemetry.addData("Path", "Leg 2: %4.1f S Elapsed", runtime.seconds());
+    /**
+     * One rising edge starts the shot. Later calls keep the button released so
+     * Hardware can finish the up stroke and the return on its own clock.
+     */
+    private void fireShot(boolean shoot4, boolean shoot3, boolean shoot2, boolean shoot1) {
+        hardware.stopDrive();
+        hardware.runCatapult(shoot4, shoot3, shoot2, shoot1, false);
+        while (opModeIsActive() && hardware.isCatapultRunning()) {
+            hardware.runCatapult(false, false, false, false, false);
+            telemetry.addData("Path", "Shot");
+            hardware.addMechanismTelemetry(telemetry);
             telemetry.update();
-        }
-
-        // Step 3:  Drive Backward for 1 Second
-        frontLeftDrive.setPower(FORWARD_SPEED);
-        frontRightDrive.setPower(FORWARD_SPEED);
-        backRightDrive.setPower(FORWARD_SPEED);
-        backLeftDrive.setPower(FORWARD_SPEED);
-        runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 0.5)) {
-            telemetry.addData("Path", "Leg 3: %4.1f S Elapsed", runtime.seconds());
-            telemetry.update();
-        }
-
-        frontLeftDrive.setPower(TURN_SPEED);
-        frontRightDrive.setPower(-TURN_SPEED);
-        backRightDrive.setPower(-TURN_SPEED);
-        backLeftDrive.setPower(TURN_SPEED);
-        runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 0.3)) {
-            telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
-            telemetry.update();
-        }
-
-
-        leftCatapult.setPower(1);
-        rightCatapult.setPower(1);
-       while (opModeIsActive() && (runtime.seconds() < 0.2)) {
-            telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
-            telemetry.update();
-
-
-            // Step 4:  Stop
-            frontLeftDrive.setPower(0);
-            frontRightDrive.setPower(0);
-            backRightDrive.setPower(0);
-            backLeftDrive.setPower(0);
-
-            telemetry.addData("Path", "Complete");
-            telemetry.update();
-            sleep(1000);
         }
     }
 }
