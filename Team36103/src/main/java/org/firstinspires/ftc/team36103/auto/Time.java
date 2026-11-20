@@ -34,6 +34,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.team36103.Hardware;
+
 /*
  * This OpMode illustrates the concept of driving a path based on time.
  * The code is structured as a LinearOpMode
@@ -56,6 +58,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Autonomous(name="Time", group="Robot")
 
 public class Time extends LinearOpMode {
+    private Hardware hardware;
 
     /* Declare OpMode members. */
     private DcMotor frontLeftDrive = null;
@@ -66,7 +69,6 @@ public class Time extends LinearOpMode {
     private DcMotor rightCatapult = null;
 
     private ElapsedTime runtime = new ElapsedTime();
-
 
     static final double FORWARD_SPEED = 1;
     static final double TURN_SPEED = 1;
@@ -118,7 +120,7 @@ public class Time extends LinearOpMode {
         backRightDrive.setPower(-TURN_SPEED);
         backLeftDrive.setPower(TURN_SPEED);
         runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 0.2)) {
+        while (opModeIsActive() && (runtime.seconds() < 0.3)) {
             telemetry.addData("Path", "Leg 2: %4.1f S Elapsed", runtime.seconds());
             telemetry.update();
         }
@@ -139,14 +141,15 @@ public class Time extends LinearOpMode {
         backRightDrive.setPower(-TURN_SPEED);
         backLeftDrive.setPower(TURN_SPEED);
         runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 0.2)) {
+        while (opModeIsActive() && (runtime.seconds() < 0.3)) {
             telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
             telemetry.update();
         }
 
+
         leftCatapult.setPower(1);
         rightCatapult.setPower(1);
-        while (opModeIsActive() && (runtime.seconds() < 0.2)) {
+       while (opModeIsActive() && (runtime.seconds() < 0.2)) {
             telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
             telemetry.update();
 
